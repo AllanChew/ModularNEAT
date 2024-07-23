@@ -46,6 +46,9 @@ public:
 	// input size, output size, and population size should all be greater than 0
 	NEAT(int input_size = 1, int output_size = 1, int pop_size_in = 150, float compatibility_thresh_in = 1.5f, float c1_c2_in = 1.f, float c3_in = 0.4f, float top_p_cutoff_in = 0.6, float add_node_mutation_prob_in = 0.03f, float add_edge_mutation_prob_in = 0.3f, float weight_mutation_prob_in = 0.8);
 
+	bool Load(const char* fname); // returns false if it fails to open file
+	void Save(const char* fname) const;
+
 	std::vector<std::tuple<NetworkBaseVisual, FitnessInterface, int>> GenerateNetworks(); // generate networks for the current organisms
 	bool UpdateGeneration(); // fitnesses should be set before calling this; returns true on success and false on failure
 
@@ -62,6 +65,9 @@ private:
 	public:
 		float fitness = -1; // gets set by test environment to a value >= 0
 		Organism(const Genome& parent) : genome{ parent } {}
+		Organism(std::ifstream& file);
+
+		void Save(std::ofstream& file) const;
 
 		const Genome& GetGenome() const { return genome; }
 
@@ -73,6 +79,10 @@ private:
 	struct Specie {
 		std::vector<Organism> organisms;
 		int specie_id = -1; // for debugging
+		Specie() {}
+		Specie(std::ifstream& file);
+
+		void Save(std::ofstream& file) const;
 	};
 
 	NEAT(const NEAT&); // disable copy ctor (since there's no reason to copy, and we don't want to copy fitness_valid_ptr)

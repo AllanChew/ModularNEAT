@@ -24,8 +24,10 @@
 
 #include "NEAT.h"
 #include "MathHelpers.h"
+#include "SerializeMap.h"
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 NEAT::NEAT(int input_size, int output_size, int pop_size_in, float compatibility_thresh_in, float c1_c2_in, float c3_in, float top_p_cutoff_in, float add_node_mutation_prob_in, float add_edge_mutation_prob_in, float weight_mutation_prob_in)
 	: fitness_valid_ptr{ std::make_shared<int>() },
@@ -261,4 +263,100 @@ void NEAT::PrintSpecieInfo() const {
 		std::cout << " {" << e.specie_id << "," << e.organisms.size() << "}";
 	}
 	std::cout << std::endl;
+}
+
+NEAT::Organism::Organism(std::ifstream& file) : genome{ file } {
+	file.read((char*)(&fitness), sizeof(float));
+}
+
+void NEAT::Organism::Save(std::ofstream& file) const {
+	genome.Save(file);
+	file.write((const char*)(&fitness), sizeof(float));
+}
+
+NEAT::Specie::Specie(std::ifstream& file) {
+	file.read((char*)(&specie_id), sizeof(int));
+
+	int numOrganisms;
+	file.read((char*)(&numOrganisms), sizeof(int));
+
+	for (int i = 0; i < numOrganisms; ++i) {
+		organisms.emplace_back(file);
+	}
+}
+
+void NEAT::Specie::Save(std::ofstream& file) const {
+	file.write((const char*)(&specie_id), sizeof(int));
+
+	int numOrganisms = organisms.size();
+	file.write((const char*)(&numOrganisms), sizeof(int));
+
+	for (auto& e : organisms) {
+		e.Save(file);
+	}
+}
+
+bool NEAT::Load(const char* fname) {
+	std::ifstream file{ fname, std::ios::binary };
+	if (!file.is_open()) {
+		std::cerr << "Failed to open " << fname << std::endl;
+		return false;
+	}
+
+	fitness_valid_ptr = std::make_shared<int>(); // make weak ptrs invalid
+
+	file.read((char*)(&node_ctr), sizeof(int));
+	file.read((char*)(&species_ctr), sizeof(int));
+	file.read((char*)(&pop_size), sizeof(int));
+	file.read((char*)(&c1_c2), sizeof(float));
+	file.read((char*)(&c3), sizeof(float));
+	file.read((char*)(&compatibility_thresh), sizeof(float));
+	file.read((char*)(&top_p_cutoff), sizeof(float));
+	file.read((char*)(&add_node_mutation_prob), sizeof(float));
+	file.read((char*)(&add_edge_mutation_prob), sizeof(float));
+	file.read((char*)(&weight_mutation_prob), sizeof(float));
+	file.read((char*)(&generation_id), sizeof(int));
+
+	NEATSerializeMap::LoadMap(forwardConnectNode, file);
+	NEATSerializeMap::LoadMap(recurrentConnectNode, file);
+
+	int speciesSize;
+	file.read((char*)(&speciesSize), sizeof(int));
+
+	species.clear();
+	for (int i = 0; i < speciesSize; ++i) {
+		species.emplace_back(file);
+	}
+
+	file.close();
+
+	return true;
+}
+
+void NEAT::Save(const char* fname) const {
+	std::ofstream file{ fname, std::ofstream::out | std::ofstream::binary | std::ofstream::trunc };
+
+	file.write((const char*)(&node_ctr), sizeof(int));
+	file.write((const char*)(&species_ctr), sizeof(int));
+	file.write((const char*)(&pop_size), sizeof(int));
+	file.write((const char*)(&c1_c2), sizeof(float));
+	file.write((const char*)(&c3), sizeof(float));
+	file.write((const char*)(&compatibility_thresh), sizeof(float));
+	file.write((const char*)(&top_p_cutoff), sizeof(float));
+	file.write((const char*)(&add_node_mutation_prob), sizeof(float));
+	file.write((const char*)(&add_edge_mutation_prob), sizeof(float));
+	file.write((const char*)(&weight_mutation_prob), sizeof(float));
+	file.write((const char*)(&generation_id), sizeof(int));
+
+	NEATSerializeMap::SaveMap(forwardConnectNode, file);
+	NEATSerializeMap::SaveMap(recurrentConnectNode, file);
+
+	int speciesSize = species.size();
+	file.write((const char*)(&speciesSize), sizeof(int));
+
+	for (auto& e : species) {
+		e.Save(file);
+	}
+
+	file.close();
 }

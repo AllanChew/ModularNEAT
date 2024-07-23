@@ -62,6 +62,9 @@ private:
 
 public:
 	Genome(int input_nodes, int output_nodes); // input nodes includes bias
+	Genome(std::ifstream& file);
+	void Save(std::ofstream& file) const;
+
 	Network GenerateNetwork() const;
 
 	bool AddNodeMutation(NEAT& n);

@@ -25,8 +25,29 @@
 #include "Genome.h"
 #include "MathHelpers.h"
 #include "NEAT.h"
+#include "SerializeMap.h"
 
 Genome::Genome(int input_nodes, int output_nodes) : num_input_nodes{ input_nodes }, num_output_nodes{ output_nodes } {}
+
+Genome::Genome(std::ifstream& file) {
+	file.read((char*)(&num_input_nodes), sizeof(int));
+	file.read((char*)(&num_output_nodes), sizeof(int));
+
+	NEATSerializeMap::LoadMap(forward_edges, file);
+	NEATSerializeMap::LoadMap(recurrent_edges, file);
+	NEATSerializeMap::LoadMap(disabled_forward_edges, file);
+	NEATSerializeMap::LoadMap(disabled_recurrent_edges, file);
+}
+
+void Genome::Save(std::ofstream& file) const {
+	file.write((const char*)(&num_input_nodes), sizeof(int));
+	file.write((const char*)(&num_output_nodes), sizeof(int));
+
+	NEATSerializeMap::SaveMap(forward_edges, file);
+	NEATSerializeMap::SaveMap(recurrent_edges, file);
+	NEATSerializeMap::SaveMap(disabled_forward_edges, file);
+	NEATSerializeMap::SaveMap(disabled_recurrent_edges, file);
+}
 
 void Genome::Crossover(const Genome& parent1) {
 	for (auto& e : forward_edges) {
