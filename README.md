@@ -52,7 +52,11 @@ For an example of how to use the module's interface, you can look at *XORTest.cp
 6. Repeat steps 2-5 until some termination condition (e.g. fitness reaches some desired value)
 
 Once you find a network you like, you can save it to a file using `NetworkBaseVisual::Save`.
-To load a network that's been saved to a file, use the `NetworkBase` and/or `NetworkBaseVisual` constructor(s) with the name/path of the file as the argument. The code below shows how to load and run a saved network.
+To load a network that's been saved to a file, use the `NetworkBase` and/or `NetworkBaseVisual` constructor(s) with the name/path of the file as the argument.
+
+You can also save and load the entire NEAT class to a file using the `NEAT::Save` and `NEAT::Load` functions respectively. This is handy if you want to pause training, and then come back to it in the future.
+
+The code below shows how to load and run a saved network.
 
 ```c
 NetworkBase network("xor.dat");
