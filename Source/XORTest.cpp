@@ -76,7 +76,7 @@ NetworkBaseVisual XORTest::Tick() {
 	std::vector<float> out = { 0 }; // vector for holding output result
 	auto generatedNetworks = xorNEAT.GenerateNetworks();
 	xorNEAT.PrintSpecieInfo();
-	std::cout << "generation id = " << generation_id << ", numSpecies = " << xorNEAT.GetNumSpecies() << ", numNetworks = " << generatedNetworks.size() << std::endl;
+	std::cout << "generation id = " << xorNEAT.GetGenerationID() << ", numSpecies = " << xorNEAT.GetNumSpecies() << ", numNetworks = " << generatedNetworks.size() << std::endl;
 	float max_fitness = 0;
 	int max_fitness_index = 0;
 	for (int i = 0; i < generatedNetworks.size(); ++i) {
@@ -112,7 +112,6 @@ NetworkBaseVisual XORTest::Tick() {
 	std::cout << "{1,1} => " << out[0] << std::endl;
 
 	xorNEAT.UpdateGeneration();
-	++generation_id;
 
 	return std::get<0>(generatedNetworks[max_fitness_index]); // return network of organism with highest fitness for visualization
 }

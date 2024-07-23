@@ -34,5 +34,4 @@ public:
 private:
 	NEAT xorNEAT;
 	const int evals_per_trial;
-	int generation_id = 0;
 };

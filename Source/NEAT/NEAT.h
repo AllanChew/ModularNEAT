@@ -49,6 +49,7 @@ public:
 	std::vector<std::tuple<NetworkBaseVisual, FitnessInterface, int>> GenerateNetworks(); // generate networks for the current organisms
 	bool UpdateGeneration(); // fitnesses should be set before calling this; returns true on success and false on failure
 
+	int GetGenerationID() const; // for debugging
 	int GetNumSpecies() const; // for debugging
 	void PrintSpecieInfo() const; // for debugging
 
@@ -95,4 +96,6 @@ private:
 	float add_node_mutation_prob;
 	float add_edge_mutation_prob;
 	float weight_mutation_prob;
+
+	int generation_id = 0; // for debugging
 };

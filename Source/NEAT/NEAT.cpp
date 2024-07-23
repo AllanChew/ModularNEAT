@@ -217,6 +217,7 @@ bool NEAT::UpdateGeneration() {
 		}
 	}
 
+	++generation_id;
 	return true;
 }
 
@@ -244,6 +245,10 @@ bool FitnessInterface::SetFitness(float f) {
 	}
 	fitness_ref = f;
 	return true;
+}
+
+int NEAT::GetGenerationID() const {
+	return generation_id;
 }
 
 int NEAT::GetNumSpecies() const {
