@@ -35,20 +35,13 @@ XORTest::XORTest(int evals_per_trial_in) : xorNEAT(2, 1, 300, 1.5f), evals_per_t
 
 // helper function for shuffling the contents of the passed in vector
 static void Shuffle(std::vector<int>& vec) {
-	std::vector<int> inputCopy = vec;
-	vec.clear();
-
-	int size = inputCopy.size();
-
-	while (size > 0) {
-		int rand_index = NEATMathHelpers::rand_int(size - 1);
-		vec.emplace_back(inputCopy[rand_index]);
-		if (rand_index != (size - 1)) {
-			const int last_elem = inputCopy[size - 1];
-			inputCopy[size - 1] = inputCopy[rand_index];
-			inputCopy[rand_index] = last_elem;
+	for (int i = vec.size() - 1; i >= 1; --i) {
+		const int rand_index = NEATMathHelpers::rand_int(i);
+		if (rand_index != i) {
+			const int last_elem = vec[i];
+			vec[i] = vec[rand_index];
+			vec[rand_index] = last_elem;
 		}
-		--size;
 	}
 }
 
